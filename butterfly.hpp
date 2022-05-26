@@ -1,15 +1,13 @@
 #include<SDL.h>
 #include "drawing.hpp"
-class Pigeon{
-
+class Butterfly{
     SDL_Rect srcRect, moverRect;
     int frame = 0;
-
+    int a = 0;
+    int check = 0;
 public:
     // add the fly function here as well.
     void draw();
     void fly();
-    Pigeon(int, int); 
-    // may add other overloaded constructors here... 
+    Butterfly(int, int); 
 };
-

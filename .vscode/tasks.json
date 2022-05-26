@@ -1,19 +1,36 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version": "2.0.0",
     "tasks": [
         {
-            "label": "build project",
-            "type": "shell",
-            "command": "g++",
+            "type": "cppbuild",
+            "label": "C/C++: g++.exe build active file",
+            "command": "C:\\mingw_dev_lib\\mingw\\mingw64\\bin\\g++.exe",
             "args": [
-                "*.cpp", 
-                "-I/usr/include/SDL2", 
-                "-lSDL2", 
-                "-lSDL2_image"
-            ], 
-            "group": {"kind": "build","isDefault": true}
+                "-g",
+                "*.cpp",
+                "-IC:\\mingw_dev_lib\\include\\SDL2\\",
+                "-LC:\\mingw_dev_lib\\lib",
+                "-w", 
+                "-lmingw32",
+                "-lSDL2main",
+                "-lSDL2",
+                "-lSDL2_image",
+                "-lSDL2_mixer", 
+                "-lSDL2_ttf",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Generated task by Debugger"
         }
-    ]
+    ],
+    "version": "2.0.0"
 }

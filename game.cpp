@@ -1,9 +1,15 @@
 #include "game.hpp"
-#include "pigeon.hpp"
+#include "HUMania.hpp"
+#include "drawing.hpp"
+
+SDL_Renderer* Drawing::gRenderer = NULL;
+SDL_Texture* Drawing::assets = NULL;
+
 bool Game::init()
 {
 	//Initialization flag
 	bool success = true;
+
 
 	//Initialize SDL
 	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
@@ -20,7 +26,7 @@ bool Game::init()
 		}
 
 		//Create window
-		gWindow = SDL_CreateWindow( "HU Life", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+		gWindow = SDL_CreateWindow( "HU Mania", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 		if( gWindow == NULL )
 		{
 			printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
@@ -29,8 +35,8 @@ bool Game::init()
 		else
 		{
 			//Create renderer for window
-			gRenderer = SDL_CreateRenderer( gWindow, -1, SDL_RENDERER_ACCELERATED );
-			if( gRenderer == NULL )
+			Drawing::gRenderer = SDL_CreateRenderer( gWindow, -1, SDL_RENDERER_ACCELERATED );
+			if( Drawing::gRenderer == NULL )
 			{
 				printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError() );
 				success = false;
@@ -38,7 +44,7 @@ bool Game::init()
 			else
 			{
 				//Initialize renderer color
-				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+				SDL_SetRenderDrawColor( Drawing::gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 
 				//Initialize PNG loading
 				int imgFlags = IMG_INIT_PNG;
@@ -47,6 +53,7 @@ bool Game::init()
 					printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
 					success = false;
 				}
+
 			}
 		}
 	}
@@ -59,30 +66,28 @@ bool Game::loadMedia()
 	//Loading success flag
 	bool success = true;
 	
-	assets = loadTexture("assets.png");
+	Drawing::assets = loadTexture("assets.png");
     gTexture = loadTexture("hu.png");
-	if(assets==NULL || gTexture==NULL)
+	if(Drawing::assets==NULL || gTexture==NULL)
     {
         printf("Unable to run due to error: %s\n",SDL_GetError());
         success =false;
     }
-
 	return success;
 }
 
 void Game::close()
 {
 	//Free loaded images
-	SDL_DestroyTexture(assets);
-	assets=NULL;
+	SDL_DestroyTexture(Drawing::assets);
+	Drawing::assets=NULL;
 	SDL_DestroyTexture(gTexture);
 	
 	//Destroy window
-	SDL_DestroyRenderer( gRenderer );
+	SDL_DestroyRenderer( Drawing::gRenderer );
 	SDL_DestroyWindow( gWindow );
 	gWindow = NULL;
-	gRenderer = NULL;
-
+	Drawing::gRenderer = NULL;
 	//Quit SDL subsystems
 	IMG_Quit();
 	SDL_Quit();
@@ -102,7 +107,7 @@ SDL_Texture* Game::loadTexture( std::string path )
 	else
 	{
 		//Create texture from surface pixels
-        newTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
+        newTexture = SDL_CreateTextureFromSurface( Drawing::gRenderer, loadedSurface );
 		if( newTexture == NULL )
 		{
 			printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
@@ -116,21 +121,11 @@ SDL_Texture* Game::loadTexture( std::string path )
 }
 void Game::run( )
 {
-    SDL_RenderClear( gRenderer );
-	//Main loop flag
 	bool quit = false;
-
-	//Event handler
 	SDL_Event e;
-	Pigeon pigeons[10];
-	for (int i=0;i<10;i++){
-		pigeons[i].mover.x = rand() % 700;
-		pigeons[i].mover.y = rand() % 500;
-		pigeons[i].assets = assets;
-	}
-	
 
-	//While application is running
+	HUMania humania;
+
 	while( !quit )
 	{
 		//Handle events on queue
@@ -142,35 +137,24 @@ void Game::run( )
 				quit = true;
 			}
 
-			if( e.type == SDL_MOUSEBUTTONDOWN){
-				if(e.button.button == SDL_BUTTON_LEFT){
-					//this is a good location to add pigeon in linked list.
-					int xMouse, yMouse;
-					SDL_GetMouseState(&xMouse,&yMouse);
-					std::cout<<"Left button pressed at : x = "<<xMouse<<" , y = "<<yMouse<<std::endl;
-				}
-
-				
-			
-				else if(e.button.button == SDL_BUTTON_RIGHT){
-					//this is a good location to remove last pigeon from linked list.
-					int xMouse, yMouse;
-					SDL_GetMouseState(&xMouse,&yMouse);
-					std::cout<<"Right button pressed at : x = "<<xMouse<<" , y = "<<yMouse<<std::endl;
-				}
-
-				
+			if(e.type == SDL_MOUSEBUTTONDOWN){
+			//this is a good location to add pigeon in linked list.
+				int xMouse, yMouse;
+				SDL_GetMouseState(&xMouse,&yMouse);
+				humania.createObject(xMouse, yMouse);
 			}
-			
-			// update();	
 		}
-		SDL_RenderClear(gRenderer); //removes everything from renderer
-		SDL_RenderCopy(gRenderer, gTexture, NULL, NULL);//Draws background to renderer
-		//draw the objects here
-		for(int i=0;i<10;i++)
-			pigeons[i].draw(gRenderer);	//draws object on renderer
-    	SDL_RenderPresent(gRenderer); //displays the updated renderer
-	    SDL_Delay(200);	//causes sdl engine to delay for specified miliseconds
+
+		SDL_RenderClear(Drawing::gRenderer); //removes everything from renderer
+		SDL_RenderCopy(Drawing::gRenderer, gTexture, NULL, NULL);//Draws background to renderer
+		//***********************draw the objects here********************
+
+		humania.drawObjects();
+
+		//****************************************************************
+    	SDL_RenderPresent(Drawing::gRenderer); //displays the updated renderer
+
+	    SDL_Delay(100);	//causes sdl engine to delay for specified miliseconds
 	}
 			
 }

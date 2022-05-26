@@ -1,15 +1,21 @@
 {
     "configurations": [
         {
-            "name": "Linux",
+            "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "C:\\mingw_dev_lib\\include\\SDL2\\"
+
             ],
-            "defines": [],
-            "compilerPath": "/usr/bin/gcc",
-            "cStandard": "c11",
-            "cppStandard": "c++17",
-            "intelliSenseMode": "clang-x64"
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:\\mingw_dev_lib\\mingw\\mingw64\\bin\\g++.exe",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "windows-gcc-x64"
         }
     ],
     "version": 4
